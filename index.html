@@ -3,389 +3,408 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Clone</title>
+    <title>Simple Chat App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .hidden {
-            display: none;
-        }
-        .chat-bubble {
-            max-width: 70%;
-            word-wrap: break-word;
-        }
         .chat-container {
-            height: calc(100vh - 130px);
+            height: calc(100vh - 160px);
+            overflow-y: auto;
         }
-        @media (min-width: 768px) {
-            .chat-container {
-                height: calc(100vh - 130px);
-            }
+        .message-container {
+            max-width: 70%;
+        }
+        .typing-indicator::after {
+            content: '...';
+            animation: typing 1.5s infinite;
+            display: inline-block;
+            width: 0;
+        }
+        @keyframes typing {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <!-- Auth Pages Container -->
-    <div id="auth-pages" class="min-h-screen flex items-center justify-center">
-        <!-- Login Page -->
-        <div id="login-page" class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-            <div class="mb-6 text-center">
-                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c07b5022-41b7-4ff1-9f27-9fbfe8086c62.png" alt="Chat app logo with speech bubbles and vibrant colors" class="mx-auto w-20 h-20 rounded-full mb-4">
-                <h1 class="text-2xl font-bold text-gray-800">Welcome Back</h1>
-                <p class="text-gray-600">Login to continue chatting</p>
+<body class="bg-gray-100">
+    <!-- Login Screen -->
+    <div id="login-screen" class="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+            <div class="text-center mb-8">
+                <img src="https://placehold.co/100x100" alt="Chat App Logo - Modern communication icon with blue bubbles" class="mx-auto mb-4 rounded-full">
+                <h1 class="text-3xl font-bold text-gray-800">Welcome to Simple Chat</h1>
+                <p class="text-gray-600 mt-2">Connect with anyone using their ID</p>
             </div>
+            
             <form id="login-form" class="space-y-4">
                 <div>
-                    <label for="login-id" class="block text-sm font-medium text-gray-700">Your ID</label>
-                    <input type="text" id="login-id" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="text" id="username" placeholder="Enter your name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
-                <div>
-                    <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" id="login-password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div>
-                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Login
-                    </button>
-                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-200">Start Chatting</button>
             </form>
-            <div class="mt-4 text-center">
-                <button id="show-register" class="text-sm text-indigo-600 hover:text-indigo-500 focus:outline-none">
-                    Don't have an account? Register
-                </button>
-            </div>
-        </div>
-
-        <!-- Register Page -->
-        <div id="register-page" class="bg-white p-8 rounded-lg shadow-md w-full max-w-md hidden">
-            <div class="mb-6 text-center">
-                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e69f3573-8950-44cf-bbe5-0e4fcf141a36.png" alt="Registration form header with welcoming illustration" class="mx-auto w-20 h-20 rounded-full mb-4">
-                <h1 class="text-2xl font-bold text-gray-800">Create Account</h1>
-                <p class="text-gray-600">Join our community</p>
-            </div>
-            <form id="register-form" class="space-y-4">
-                <div>
-                    <label for="register-name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                    <input type="text" id="register-name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div>
-                    <label for="register-id" class="block text-sm font-medium text-gray-700">Choose Your ID</label>
-                    <input type="text" id="register-id" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div>
-                    <label for="register-password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" id="register-password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div>
-                    <label for="register-confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                    <input type="password" id="register-confirm-password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div>
-                    <label for="register-avatar" class="block text-sm font-medium text-gray-700">Profile Picture (URL)</label>
-                    <input type="text" id="register-avatar" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cb182f99-5e3b-44e1-bc3e-7a259bd68756.png">
-                </div>
-                <div>
-                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Register
-                    </button>
-                </div>
-            </form>
-            <div class="mt-4 text-center">
-                <button id="show-login" class="text-sm text-indigo-600 hover:text-indigo-500 focus:outline-none">
-                    Already have an account? Login
-                </button>
+            
+            <div class="mt-6 text-center text-sm text-gray-500">
+                No account needed - just enter a name to start
             </div>
         </div>
     </div>
 
-    <!-- Chat App Container (Hidden Initially) -->
-    <div id="chat-app" class="hidden">
+    <!-- Chat Screen -->
+    <div id="chat-screen" class="hidden h-screen flex flex-col">
         <!-- Header -->
-        <header class="bg-indigo-600 text-white p-4 shadow-md">
-            <div class="container mx-auto flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/575f6190-4bcc-4ca9-94aa-569e37329e96.png" alt="User profile picture" class="w-8 h-8 rounded-full" id="user-avatar">
-                    <span class="font-semibold" id="user-name">User</span>
-                </div>
-                <button id="logout-btn" class="px-3 py-1 bg-white text-indigo-600 rounded-md text-sm font-medium hover:bg-gray-100">
-                    Logout
+        <header class="bg-white shadow-sm py-4 px-6 flex items-center justify-between border-b border-gray-200">
+            <div class="flex items-center">
+                <button id="back-button" class="mr-4 text-blue-600 hover:text-blue-800 hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
                 </button>
+                <div id="current-chat" class="flex items-center">
+                    <img id="chat-avatar" src="https://placehold.co/40x40" alt="Profile picture of person you're chatting with" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                        <h2 id="chat-name" class="font-semibold text-gray-800">Select a chat</h2>
+                        <p id="chat-status" class="text-xs text-gray-500">Online</p>
+                    </div>
+                </div>
             </div>
+            <button id="profile-button" class="text-blue-600 hover:text-blue-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
         </header>
 
-        <!-- Main Content -->
-        <div class="container mx-auto flex h-full">
-            <!-- Contacts Sidebar -->
-            <div class="w-full md:w55 bg-white border-r border-gray-200 chat-container overflow-y-auto">
+        <!-- Main Chat Area -->
+        <div class="flex-1 overflow-hidden flex">
+            <!-- Chat List -->
+            <div id="chat-list" class="w-full md:w-80 bg-white border-r border-gray-200 overflow-y-auto">
                 <div class="p-4 border-b border-gray-200">
                     <div class="relative">
-                        <input type="text" id="search-contact" placeholder="Search contacts..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="search-contact" placeholder="Search by ID or name" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
                     </div>
                 </div>
-                <div class="divide-y divide-gray-200" id="contacts-list">
-                    <!-- Contacts will be populated here dynamically -->
-                    <div class="p-4 hover:bg-gray-50 cursor-pointer">
-                        <div class="flex items-center space-x-3">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/77d3e264-4f2f-4828-b9cb-bb0362c7be53.png" alt="Contact profile picture" class="w-10 h-10 rounded-full">
-                            <div>
-                                <p class="font-medium">john123</p>
-                                <p class="text-xs text-gray-500">Hi there!</p>
-                            </div>
-                        </div>
+                
+                <div id="contacts-list" class="space-y-1 p-2">
+                    <div class="text-center py-10 text-gray-500">
+                        No contacts found. Search for someone by their ID.
                     </div>
                 </div>
             </div>
 
-            <!-- Chat Area -->
-            <div class="hidden md:flex flex-col w-2/3 border-l border-gray-200 chat-container">
-                <!-- Chat Header -->
-                <div class="p-4 border-b border-gray-200 flex items-center space-x-3">
-                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/7451cbd9-8e56-4d64-ae0a-ff4419854913.png" alt="Selected contact profile picture" class="w-10 h-10 rounded-full" id="chat-avatar">
-                    <div>
-                        <p class="font-medium" id="chat-name">Select a contact</p>
-                        <p class="text-xs text-gray-500" id="chat-status">Online</p>
-                    </div>
+            <!-- Chat Messages -->
+            <div id="messages-panel" class="hidden md:flex flex-col flex-1 bg-gray-50">
+                <div id="no-chat-selected" class="flex flex-col items-center justify-center h-full text-center p-8">
+                    <img src="https://placehold.co/200x200" alt="Select a chat to start messaging - illustration of messaging bubbles" class="w-40 h-40 mb-4">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">Select a chat to start messaging</h3>
+                    <p class="text-gray-500">Find users by their ID or start a new conversation.</p>
                 </div>
 
-                <!-- Messages Container -->
-                <div class="flex-1 p-4 overflow-y-auto bg-gray-50" id="messages-container">
-                    <!-- Messages will be populated here dynamically -->
-                    <div class="mb-4 flex justify-start">
-                        <div class="bg-white p-3 rounded-lg shadow-sm chat-bubble">
-                            <p>Hello! How are you?</p>
-                            <p class="text-xs text-gray-500 mt-1">10:30 AM</p>
-                        </div>
+                <div id="chat-area" class="hidden flex-col h-full">
+                    <!-- Messages will appear here -->
+                    <div id="messages-container" class="chat-container p-4 space-y-2">
+                        
                     </div>
-                    <div class="mb-4 flex justify-end">
-                        <div class="bg-indigo-100 p-3 rounded-lg shadow-sm chat-bubble">
-                            <p>I'm good, thanks for asking!</p>
-                            <p class="text-xs text-gray-500 mt-1">10:32 AM</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Message Input -->
-                <div class="p-4 border-t border-gray-200 bg-white">
-                    <div class="flex space-x-2">
-                        <input type="text" id="message-input" placeholder="Type a message..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <button id="send-message" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            Send
-                        </button>
+                    
+                    <!-- Message Input -->
+                    <div class="bg-white p-4 border-t border-gray-200">
+                        <form id="message-form" class="flex space-x-2">
+                            <input type="text" id="message-input" placeholder="Type a message..." class="flex-1 border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 w-10 h-10 flex items-center justify-center transition duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Empty State for Mobile -->
-            <div class="md:hidden flex flex-col items-center justify-center w-full h-full bg-gray-50">
-                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f5dd71fb-5eda-46d2-b5f6-8cd95624351e.png" alt="Select chat illustration" class="w-32 h-32 mb-4">
-                <h3 class="text-lg font-medium text-gray-900 mb-1">Select a chat</h3>
-                <p class="text-gray-500 text-center max-w-xs">Choose a contact from the list to start chatting</p>
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">Your Profile</h3>
+                <button id="close-profile" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
+            
+            <div class="flex flex-col items-center mb-6">
+                <img src="https://placehold.co/100x100" alt="Your profile picture" id="user-avatar" class="w-20 h-20 rounded-full mb-3">
+                <h2 id="profile-name" class="font-semibold text-lg"></h2>
+                <p class="text-gray-500 text-sm">Your ID: <span id="user-id" class="font-mono"></span></p>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Share your ID</label>
+                    <div class="flex">
+                        <input type="text" id="share-id-input" readonly class="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:outline-none">
+                        <button id="copy-id" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-lg transition duration-200">Copy</button>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Link your profile</label>
+                    <div class="flex">
+                        <input type="text" id="profile-link-input" readonly class="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:outline-none">
+                        <button id="copy-link" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-lg transition duration-200">Copy</button>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="logout-button" class="mt-6 w-full bg-red-100 hover:bg-red-200 text-red-700 py-2 px-4 rounded-lg transition duration-200">
+                Logout
+            </button>
         </div>
     </div>
 
     <script>
-        // Storage for users and messages
-        let users = JSON.parse(localStorage.getItem('chat_users')) || [];
-        let messages = JSON.parse(localStorage.getItem('chat_messages')) || {};
-        let currentUser = null;
-        let selectedContactId = null;
+        // Simulated database
+        const db = {
+            users: {},
+            messages: {},
+            currentUser: null
+        };
 
-        // DOM Elements
-        const authPages = document.getElementById('auth-pages');
-        const loginPage = document.getElementById('login-page');
-        const registerPage = document.getElementById('register-page');
-        const showRegister = document.getElementById('show-register');
-        const showLogin = document.getElementById('show-login');
+        // DOM elements
+        const loginScreen = document.getElementById('login-screen');
         const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const chatApp = document.getElementById('chat-app');
-        const logoutBtn = document.getElementById('logout-btn');
-        const contactsList = document.getElementById('contacts-list');
-        const searchContact = document.getElementById('search-contact');
-        const userAvatar = document.getElementById('user-avatar');
-        const userName = document.getElementById('user-name');
-        const chatAvatar = document.getElementById('chat-avatar');
-        const chatName = document.getElementById('chat-name');
-        const chatStatus = document.getElementById('chat-status');
+        const chatScreen = document.getElementById('chat-screen');
+        const chatList = document.getElementById('chat-list');
+        const messagesPanel = document.getElementById('messages-panel');
+        const noChatSelected = document.getElementById('no-chat-selected');
+        const chatArea = document.getElementById('chat-area');
         const messagesContainer = document.getElementById('messages-container');
+        const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
-        const sendMessage = document.getElementById('send-message');
+        const searchContact = document.getElementById('search-contact');
+        const contactsList = document.getElementById('contacts-list');
+        const backButton = document.getElementById('back-button');
+        const currentChat = document.getElementById('current-chat');
+        const profileButton = document.getElementById('profile-button');
+        const profileModal = document.getElementById('profile-modal');
+        const closeProfile = document.getElementById('close-profile');
+        const profileName = document.getElementById('profile-name');
+        const userId = document.getElementById('user-id');
+        const shareIdInput = document.getElementById('share-id-input');
+        const profileLinkInput = document.getElementById('profile-link-input');
+        const copyId = document.getElementById('copy-id');
+        const copyLink = document.getElementById('copy-link');
+        const logoutButton = document.getElementById('logout-button');
+        const userAvatar = document.getElementById('user-avatar');
 
-        // Check if user is already logged in
-        function checkLoggedIn() {
-            const userId = localStorage.getItem('current_user_id');
-            if (userId) {
-                const user = users.find(u => u.id === userId);
-                if (user) {
-                    currentUser = user;
-                    showChatApp();
-                }
+        // Random ID generator
+        function generateId() {
+            return 'id-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Random color generator for avatars
+        function getRandomColor() {
+            const colors = ['blue', 'green', 'purple', 'pink', 'orange', 'red'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Generate avatar URL based on name
+        function generateAvatarUrl(name) {
+            const color = getRandomColor();
+            return `https://placehold.co/100x100/${color}/white?text=${name.charAt(0).toUpperCase()}`;
+        }
+
+        // Login handler
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            
+            if (username) {
+                // Create user if not exists
+                const userId = generateId();
+                const user = {
+                    id: userId,
+                    name: username,
+                    avatar: generateAvatarUrl(username),
+                    lastSeen: 'Online',
+                    contacts: []
+                };
+                
+                db.users[userId] = user;
+                db.currentUser = userId;
+                
+                // Update profile
+                profileName.textContent = username;
+                userId.textContent = userId;
+                shareIdInput.value = userId;
+                profileLinkInput.value = `${window.location.href.split('?')[0]}?user=${userId}`;
+                userAvatar.src = user.avatar;
+                
+                // Show chat screen
+                loginScreen.classList.add('hidden');
+                chatScreen.classList.remove('hidden');
+                
+                // Check URL for user parameter to auto-start chat
+                checkUrlForChat();
+            }
+        });
+
+        // Check URL for user parameter
+        function checkUrlForChat() {
+            const params = new URLSearchParams(window.location.search);
+            const userIdParam = params.get('user');
+            
+            if (userIdParam && userIdParam !== db.currentUser) {
+                startChatWithUser(userIdParam);
+                
+                // Update URL without refresh
+                const newUrl = window.location.pathname;
+                window.history.pushState({}, '', newUrl);
             }
         }
 
-        // Show login page
-        function showLoginPage() {
-            loginPage.classList.remove('hidden');
-            registerPage.classList.add('hidden');
-        }
-
-        // Show register page
-        function showRegisterPage() {
-            loginPage.classList.add('hidden');
-            registerPage.classList.remove('hidden');
-        }
-
-        // Show chat app
-        function showChatApp() {
-            authPages.classList.add('hidden');
-            chatApp.classList.remove('hidden');
+        // Search contacts handler
+        searchContact.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
             
-            // Update user info
-            userAvatar.src = currentUser.avatar || 'https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cbd68d11-2317-4051-994f-7fec10647a68.png';
-            userName.textContent = currentUser.name;
+            if (!searchTerm) {
+                contactsList.innerHTML = '<div class="text-center py-10 text-gray-500">No contacts found. Search for someone by their ID.</div>';
+                return;
+            }
             
-            // Load contacts
-            loadContacts();
-        }
-
-        // Load contacts
-        function loadContacts(query = '') {
-            contactsList.innerHTML = '';
-            
-            // Filter contacts based on search query
-            const filteredUsers = users.filter(user => 
-                user.id !== currentUser.id && 
-                (user.name.toLowerCase().includes(query.toLowerCase()) || 
-                 user.id.toLowerCase().includes(query.toLowerCase()))
-            );
-            
-            // Add each contact to the list
-            filteredUsers.forEach(user => {
-                const lastMessage = getLastMessage(user.id);
-                
-                const contactDiv = document.createElement('div');
-                contactDiv.className = 'p-4 hover:bg-gray-50 cursor-pointer';
-                contactDiv.onclick = () => selectContact(user.id);
-                
-                contactDiv.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <img src="${user.avatar || 'https://placehold.co/40x40'}" alt="${user.name}'s profile picture" class="w-10 h-10 rounded-full">
-                        <div>
-                            <p class="font-medium">${user.name}</p>
-                            <p class="text-xs text-gray-500">${lastMessage?.text || ''}</p>
-                        </div>
-                    </div>
-                `;
-                
-                contactsList.appendChild(contactDiv);
+            const results = Object.values(db.users).filter(user => {
+                return user.id !== db.currentUser && 
+                      (user.id.toLowerCase().includes(searchTerm) || 
+                       user.name.toLowerCase().includes(searchTerm));
             });
-        }
-
-        // Get last message with a contact
-        function getLastMessage(contactId) {
-            const chatId = generateChatId(currentUser.id, contactId);
-            if (messages[chatId] && messages[chatId].length > 0) {
-                return messages[chatId][messages[chatId].length - 1];
-            }
-            return null;
-        }
-
-        // Select a contact to chat with
-        function selectContact(contactId) {
-            selectedContactId = contactId;
-            const contact = users.find(u => u.id === contactId);
             
-            // Update chat header
-            chatAvatar.src = contact.avatar || 'https://placehold.co/40x40';
-            chatName.textContent = contact.name;
-            chatStatus.textContent = 'Online';
-            
-            // Load messages
-            loadMessages(contactId);
-            
-            // Show chat area on mobile
-            document.querySelector('.md\\:hidden').classList.add('hidden');
-            document.querySelector('.md\\:flex').classList.remove('hidden');
-        }
-
-        // Load messages with a contact
-        function loadMessages(contactId) {
-            messagesContainer.innerHTML = '';
-            
-            const chatId = generateChatId(currentUser.id, contactId);
-            if (messages[chatId]) {
-                messages[chatId].forEach(msg => {
-                    const isCurrentUser = msg.senderId === currentUser.id;
+            if (results.length === 0) {
+                contactsList.innerHTML = '<div class="text-center py-10 text-gray-500">No contacts found. Try a different search.</div>';
+            } else {
+                contactsList.innerHTML = '';
+                results.forEach(user => {
+                    const contactElement = document.createElement('div');
+                    contactElement.className = 'flex items-center p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition duration-200';
+                    contactElement.onclick = () => startChatWithUser(user.id);
                     
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = `mb-4 flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`;
-                    
-                    messageDiv.innerHTML = `
-                        <div class="${isCurrentUser ? 'bg-indigo-100' : 'bg-white'} p-3 rounded-lg shadow-sm chat-bubble">
-                            <p>${msg.text}</p>
-                            <p class="text-xs text-gray-500 mt-1">${formatTime(msg.timestamp)}</p>
+                    contactElement.innerHTML = `
+                        <img src="${user.avatar}" alt="Profile picture of ${user.name}" class="w-10 h-10 rounded-full mr-3">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-800">${user.name}</h3>
+                            <p class="text-sm text-gray-500">${user.id}</p>
                         </div>
                     `;
                     
-                    messagesContainer.appendChild(messageDiv);
+                    contactsList.appendChild(contactElement);
                 });
-                
-                // Scroll to bottom
+            }
+        });
+
+        // Start chat with user
+        function startChatWithUser(userId) {
+            const user = db.users[userId];
+            if (!user) {
+                alert('User not found. That ID might not exist yet.');
+                return;
+            }
+            
+            // Update UI
+            document.getElementById('chat-name').textContent = user.name;
+            document.getElementById('chat-avatar').src = user.avatar;
+            document.getElementById('chat-status').textContent = user.lastSeen;
+            
+            // Hide chat list on mobile
+            if (window.innerWidth < 768) {
+                chatList.classList.add('hidden');
+                backButton.classList.remove('hidden');
+            }
+            
+            // Show chat area
+            noChatSelected.classList.add('hidden');
+            chatArea.classList.remove('hidden');
+            
+            // Load or create conversation
+            const conversationId = [db.currentUser, userId].sort().join('-');
+            if (!db.messages[conversationId]) {
+                db.messages[conversationId] = [];
+            }
+            
+            // Display messages
+            renderMessages(conversationId);
+            
+            // Auto-scroll to bottom
+            setTimeout(() => {
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 100);
+            
+            // Add to contacts if not already
+            if (!db.users[db.currentUser].contacts.includes(userId)) {
+                db.users[db.currentUser].contacts.push(userId);
             }
         }
 
-        // Send a message
-        function sendMessageHandler() {
-            if (!selectedContactId || !messageInput.value.trim()) return;
+        // Render messages
+        function renderMessages(conversationId) {
+            messagesContainer.innerHTML = '';
             
-            const chatId = generateChatId(currentUser.id, selectedContactId);
-            const newMessage = {
-                text: messageInput.value.trim(),
-                senderId: currentUser.id,
-                timestamp: Date.now()
-            };
+            const messages = db.messages[conversationId] || [];
             
-            // Add message to storage
-            if (!messages[chatId]) {
-                messages[chatId] = [];
-            }
-            messages[chatId].push(newMessage);
-            localStorage.setItem('chat_messages', JSON.stringify(messages));
-            
-            // Clear input
-            messageInput.value = '';
-            
-            // Reload messages
-            loadMessages(selectedContactId);
-            
-            // Update contacts list
-            loadContacts(searchContact.value);
+            messages.forEach(msg => {
+                const isMe = msg.sender === db.currentUser;
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = `message-container ${isMe ? 'ml-auto' : 'mr-auto'}`;
+                
+                messageElement.innerHTML = `
+                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'} mb-1 slide-in">
+                        <div class="${isMe ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} px-4 py-2 rounded-xl shadow-sm max-w-full">
+                            ${msg.text}
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 ${isMe ? 'text-right mr-2' : 'text-left ml-2'} mb-3">
+                        ${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                `;
+                
+                messagesContainer.appendChild(messageElement);
+            });
         }
 
-        // Generate chat ID between two users (always same regardless of order)
-        function generateChatId(id1, id2) {
-            return [id1, id2].sort().join('_');
-        }
-
-        // Format timestamp to readable time
-        function formatTime(timestamp) {
-            return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-
-        // Event Listeners
-        showRegister.addEventListener('click', showRegisterPage);
-        showLogin.addEventListener('click', showLoginPage);
-        
-        loginForm.addEventListener('submit', (e) => {
+        // Send message handler
+        messageForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const id = document.getElementById('login-id').value;
-            const password = document.getElementById('login-password').value;
+            const text = messageInput.value.trim();
             
-            // Find user
-            const user = users.find(u => u.id === id && u.password === password);
-            if (user) {
-                currentUser = user;
-                localStorage.setItem('current_user_id', user.id);
-                showChatApp();
-      
+            if (text && document.getElementById('chat-name').textContent !== 'Select a chat') {
+                const receiver = Object.values(db.users).find(user => 
+                    user.name === document.getElementById('chat-name').textContent).id;
+                
+                const conversationId = [db.currentUser, receiver].sort().join('-');
+                const message = {
+                    sender: db.currentUser,
+                    receiver: receiver,
+                    text: text,
+                    timestamp: Date.now(),
+                    read: false
+                };
+                
+                db.messages[conversationId].push(message);
+                messageInput.value = '';
+                
+                // Add to contacts if not already
+                if (!db.users[db.currentUser].contacts.includes(receiver)) {
+                    db.users[db.currentUser].contacts.push(receiver);
+                }
+                
+           
