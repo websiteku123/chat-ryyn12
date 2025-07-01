@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hidden {
+            display: none;
+        }
+        .chat-bubble {
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .chat-container {
+            height: calc(100vh - 130px);
+        }
+        @media (min-width: 768px) {
+            .chat-container {
+                height: calc(100vh - 130px);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Auth Pages Container -->
+    <div id="auth-pages" class="min-h-screen flex items-center justify-center">
+        <!-- Login Page -->
+        <div id="login-page" class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+            <div class="mb-6 text-center">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c07b5022-41b7-4ff1-9f27-9fbfe8086c62.png" alt="Chat app logo with speech bubbles and vibrant colors" class="mx-auto w-20 h-20 rounded-full mb-4">
+                <h1 class="text-2xl font-bold text-gray-800">Welcome Back</h1>
+                <p class="text-gray-600">Login to continue chatting</p>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="login-id" class="block text-sm font-medium text-gray-700">Your ID</label>
+                    <input type="text" id="login-id" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="login-password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Login
+                    </button>
+                </div>
+            </form>
+            <div class="mt-4 text-center">
+                <button id="show-register" class="text-sm text-indigo-600 hover:text-indigo-500 focus:outline-none">
+                    Don't have an account? Register
+                </button>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="register-page" class="bg-white p-8 rounded-lg shadow-md w-full max-w-md hidden">
+            <div class="mb-6 text-center">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e69f3573-8950-44cf-bbe5-0e4fcf141a36.png" alt="Registration form header with welcoming illustration" class="mx-auto w-20 h-20 rounded-full mb-4">
+                <h1 class="text-2xl font-bold text-gray-800">Create Account</h1>
+                <p class="text-gray-600">Join our community</p>
+            </div>
+            <form id="register-form" class="space-y-4">
+                <div>
+                    <label for="register-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <input type="text" id="register-name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="register-id" class="block text-sm font-medium text-gray-700">Choose Your ID</label>
+                    <input type="text" id="register-id" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="register-password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="register-password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="register-confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    <input type="password" id="register-confirm-password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="register-avatar" class="block text-sm font-medium text-gray-700">Profile Picture (URL)</label>
+                    <input type="text" id="register-avatar" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cb182f99-5e3b-44e1-bc3e-7a259bd68756.png">
+                </div>
+                <div>
+                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Register
+                    </button>
+                </div>
+            </form>
+            <div class="mt-4 text-center">
+                <button id="show-login" class="text-sm text-indigo-600 hover:text-indigo-500 focus:outline-none">
+                    Already have an account? Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat App Container (Hidden Initially) -->
+    <div id="chat-app" class="hidden">
+        <!-- Header -->
+        <header class="bg-indigo-600 text-white p-4 shadow-md">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/575f6190-4bcc-4ca9-94aa-569e37329e96.png" alt="User profile picture" class="w-8 h-8 rounded-full" id="user-avatar">
+                    <span class="font-semibold" id="user-name">User</span>
+                </div>
+                <button id="logout-btn" class="px-3 py-1 bg-white text-indigo-600 rounded-md text-sm font-medium hover:bg-gray-100">
+                    Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="container mx-auto flex h-full">
+            <!-- Contacts Sidebar -->
+            <div class="w-full md:w55 bg-white border-r border-gray-200 chat-container overflow-y-auto">
+                <div class="p-4 border-b border-gray-200">
+                    <div class="relative">
+                        <input type="text" id="search-contact" placeholder="Search contacts..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div class="divide-y divide-gray-200" id="contacts-list">
+                    <!-- Contacts will be populated here dynamically -->
+                    <div class="p-4 hover:bg-gray-50 cursor-pointer">
+                        <div class="flex items-center space-x-3">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/77d3e264-4f2f-4828-b9cb-bb0362c7be53.png" alt="Contact profile picture" class="w-10 h-10 rounded-full">
+                            <div>
+                                <p class="font-medium">john123</p>
+                                <p class="text-xs text-gray-500">Hi there!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="hidden md:flex flex-col w-2/3 border-l border-gray-200 chat-container">
+                <!-- Chat Header -->
+                <div class="p-4 border-b border-gray-200 flex items-center space-x-3">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/7451cbd9-8e56-4d64-ae0a-ff4419854913.png" alt="Selected contact profile picture" class="w-10 h-10 rounded-full" id="chat-avatar">
+                    <div>
+                        <p class="font-medium" id="chat-name">Select a contact</p>
+                        <p class="text-xs text-gray-500" id="chat-status">Online</p>
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div class="flex-1 p-4 overflow-y-auto bg-gray-50" id="messages-container">
+                    <!-- Messages will be populated here dynamically -->
+                    <div class="mb-4 flex justify-start">
+                        <div class="bg-white p-3 rounded-lg shadow-sm chat-bubble">
+                            <p>Hello! How are you?</p>
+                            <p class="text-xs text-gray-500 mt-1">10:30 AM</p>
+                        </div>
+                    </div>
+                    <div class="mb-4 flex justify-end">
+                        <div class="bg-indigo-100 p-3 rounded-lg shadow-sm chat-bubble">
+                            <p>I'm good, thanks for asking!</p>
+                            <p class="text-xs text-gray-500 mt-1">10:32 AM</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div class="p-4 border-t border-gray-200 bg-white">
+                    <div class="flex space-x-2">
+                        <input type="text" id="message-input" placeholder="Type a message..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button id="send-message" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State for Mobile -->
+            <div class="md:hidden flex flex-col items-center justify-center w-full h-full bg-gray-50">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f5dd71fb-5eda-46d2-b5f6-8cd95624351e.png" alt="Select chat illustration" class="w-32 h-32 mb-4">
+                <h3 class="text-lg font-medium text-gray-900 mb-1">Select a chat</h3>
+                <p class="text-gray-500 text-center max-w-xs">Choose a contact from the list to start chatting</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Storage for users and messages
+        let users = JSON.parse(localStorage.getItem('chat_users')) || [];
+        let messages = JSON.parse(localStorage.getItem('chat_messages')) || {};
+        let currentUser = null;
+        let selectedContactId = null;
+
+        // DOM Elements
+        const authPages = document.getElementById('auth-pages');
+        const loginPage = document.getElementById('login-page');
+        const registerPage = document.getElementById('register-page');
+        const showRegister = document.getElementById('show-register');
+        const showLogin = document.getElementById('show-login');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const chatApp = document.getElementById('chat-app');
+        const logoutBtn = document.getElementById('logout-btn');
+        const contactsList = document.getElementById('contacts-list');
+        const searchContact = document.getElementById('search-contact');
+        const userAvatar = document.getElementById('user-avatar');
+        const userName = document.getElementById('user-name');
+        const chatAvatar = document.getElementById('chat-avatar');
+        const chatName = document.getElementById('chat-name');
+        const chatStatus = document.getElementById('chat-status');
+        const messagesContainer = document.getElementById('messages-container');
+        const messageInput = document.getElementById('message-input');
+        const sendMessage = document.getElementById('send-message');
+
+        // Check if user is already logged in
+        function checkLoggedIn() {
+            const userId = localStorage.getItem('current_user_id');
+            if (userId) {
+                const user = users.find(u => u.id === userId);
+                if (user) {
+                    currentUser = user;
+                    showChatApp();
+                }
+            }
+        }
+
+        // Show login page
+        function showLoginPage() {
+            loginPage.classList.remove('hidden');
+            registerPage.classList.add('hidden');
+        }
+
+        // Show register page
+        function showRegisterPage() {
+            loginPage.classList.add('hidden');
+            registerPage.classList.remove('hidden');
+        }
+
+        // Show chat app
+        function showChatApp() {
+            authPages.classList.add('hidden');
+            chatApp.classList.remove('hidden');
+            
+            // Update user info
+            userAvatar.src = currentUser.avatar || 'https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cbd68d11-2317-4051-994f-7fec10647a68.png';
+            userName.textContent = currentUser.name;
+            
+            // Load contacts
+            loadContacts();
+        }
+
+        // Load contacts
+        function loadContacts(query = '') {
+            contactsList.innerHTML = '';
+            
+            // Filter contacts based on search query
+            const filteredUsers = users.filter(user => 
+                user.id !== currentUser.id && 
+                (user.name.toLowerCase().includes(query.toLowerCase()) || 
+                 user.id.toLowerCase().includes(query.toLowerCase()))
+            );
+            
+            // Add each contact to the list
+            filteredUsers.forEach(user => {
+                const lastMessage = getLastMessage(user.id);
+                
+                const contactDiv = document.createElement('div');
+                contactDiv.className = 'p-4 hover:bg-gray-50 cursor-pointer';
+                contactDiv.onclick = () => selectContact(user.id);
+                
+                contactDiv.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <img src="${user.avatar || 'https://placehold.co/40x40'}" alt="${user.name}'s profile picture" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="font-medium">${user.name}</p>
+                            <p class="text-xs text-gray-500">${lastMessage?.text || ''}</p>
+                        </div>
+                    </div>
+                `;
+                
+                contactsList.appendChild(contactDiv);
+            });
+        }
+
+        // Get last message with a contact
+        function getLastMessage(contactId) {
+            const chatId = generateChatId(currentUser.id, contactId);
+            if (messages[chatId] && messages[chatId].length > 0) {
+                return messages[chatId][messages[chatId].length - 1];
+            }
+            return null;
+        }
+
+        // Select a contact to chat with
+        function selectContact(contactId) {
+            selectedContactId = contactId;
+            const contact = users.find(u => u.id === contactId);
+            
+            // Update chat header
+            chatAvatar.src = contact.avatar || 'https://placehold.co/40x40';
+            chatName.textContent = contact.name;
+            chatStatus.textContent = 'Online';
+            
+            // Load messages
+            loadMessages(contactId);
+            
+            // Show chat area on mobile
+            document.querySelector('.md\\:hidden').classList.add('hidden');
+            document.querySelector('.md\\:flex').classList.remove('hidden');
+        }
+
+        // Load messages with a contact
+        function loadMessages(contactId) {
+            messagesContainer.innerHTML = '';
+            
+            const chatId = generateChatId(currentUser.id, contactId);
+            if (messages[chatId]) {
+                messages[chatId].forEach(msg => {
+                    const isCurrentUser = msg.senderId === currentUser.id;
+                    
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `mb-4 flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`;
+                    
+                    messageDiv.innerHTML = `
+                        <div class="${isCurrentUser ? 'bg-indigo-100' : 'bg-white'} p-3 rounded-lg shadow-sm chat-bubble">
+                            <p>${msg.text}</p>
+                            <p class="text-xs text-gray-500 mt-1">${formatTime(msg.timestamp)}</p>
+                        </div>
+                    `;
+                    
+                    messagesContainer.appendChild(messageDiv);
+                });
+                
+                // Scroll to bottom
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        // Send a message
+        function sendMessageHandler() {
+            if (!selectedContactId || !messageInput.value.trim()) return;
+            
+            const chatId = generateChatId(currentUser.id, selectedContactId);
+            const newMessage = {
+                text: messageInput.value.trim(),
+                senderId: currentUser.id,
+                timestamp: Date.now()
+            };
+            
+            // Add message to storage
+            if (!messages[chatId]) {
+                messages[chatId] = [];
+            }
+            messages[chatId].push(newMessage);
+            localStorage.setItem('chat_messages', JSON.stringify(messages));
+            
+            // Clear input
+            messageInput.value = '';
+            
+            // Reload messages
+            loadMessages(selectedContactId);
+            
+            // Update contacts list
+            loadContacts(searchContact.value);
+        }
+
+        // Generate chat ID between two users (always same regardless of order)
+        function generateChatId(id1, id2) {
+            return [id1, id2].sort().join('_');
+        }
+
+        // Format timestamp to readable time
+        function formatTime(timestamp) {
+            return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Event Listeners
+        showRegister.addEventListener('click', showRegisterPage);
+        showLogin.addEventListener('click', showLoginPage);
+        
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('login-id').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Find user
+            const user = users.find(u => u.id === id && u.password === password);
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('current_user_id', user.id);
+                showChatApp();
+      
