@@ -1,261 +1,382 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Chat App</title>
+    <title>Toko Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .chat-container {
-            height: calc(100vh - 160px);
-            overflow-y: auto;
+        .fade-in {
+            animation: fadeIn 0.5s;
         }
-        .message-box {
-            max-width: 70%;
-            word-wrap: break-word;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-        .transition-all {
-            transition-property: all;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 150ms;
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <!-- Login Screen -->
-    <div id="login-screen" class="fixed inset-0 flex items-center justify-center bg-white z-50 transition-all duration-300">
-        <div class="bg-gray-50 p-8 rounded-lg shadow-xl w-full max-w-md">
-            <div class="text-center mb-6">
-                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/b1af0652-5e9b-486b-8add-71bfcb517641.png" alt="Chat app logo with a speech bubble icon in blue gradient" class="mx-auto mb-4 rounded-full">
-                <h1 class="text-3xl font-bold text-gray-800">Simple Chat</h1>
-                <p class="text-gray-600 mt-2">Connect with anyone using their ID</p>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Your ID</label>
-                    <input type="text" id="username" placeholder="Enter your unique ID" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
-                </div>
-                <button id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-medium transition-colors duration-200">Start Chatting</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Chat Interface -->
-    <div id="chat-screen" class="hidden h-screen flex flex-col">
+<body class="bg-gray-50 font-sans">
+    <div class="min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/133543de-81bd-4aec-96bb-a88c08d66817.png" alt="User profile avatar with blue background" class="rounded-full">
-                <div>
-                    <p class="font-medium">Your ID: <span id="current-user-id" class="text-blue-600"></span></p>
-                    <p class="text-xs text-gray-500">Online</p>
+        <header class="bg-blue-600 text-white shadow-md">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <img src="https://files.catbox.moe/euuyvp.jpg" alt="Logo toko online dengan desain modern warna biru dan putih" class="rounded-full" />
                 </div>
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><button onclick="showCustomerView()" class="hover:text-blue-200 transition">Beranda</button></li>
+                        <li><button onclick="showAdminView()" class="hover:text-blue-200 transition">Admin</button></li>
+                        <li id="cartButton" class="relative cursor-pointer hover:text-blue-200 transition" onclick="toggleCart()">
+                            Keranjang
+                            <span id="cartCount" class="absolute -top-2 -right-3 bg-red-500 text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-            <button id="logout-btn" class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-            </button>
         </header>
 
-        <!-- Chat Area -->
-        <div class="flex-1 flex flex-col">
-            <!-- Recipient Selector -->
-            <div class="bg-white px-6 py-3 border-b flex items-center space-x-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                </svg>
-                <input type="text" id="target-user-id" placeholder="Enter recipient ID" class="flex-1 outline-none text-gray-700">
-                <button id="connect-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-md text-sm">Connect</button>
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-4 py-8">
+            <!-- Customer View -->
+            <div id="customerView">
+                <section class="mb-12">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-800">Produk Terbaik Untuk Anda</h2>
+                        <div class="relative w-64">
+                            <input type="text" placeholder="Cari produk..." 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                   oninput="filterProducts(this.value)">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a28d231e-4f43-44f5-9da6-e3dc73b388ab.png" alt="Ikon pencarian sederhana" class="absolute right-3 top-2.5 w-5 h-5" />
+                        </div>
+                    </div>
+                    
+                    <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Products will be loaded here -->
+                    </div>
+                </section>
             </div>
 
-            <!-- Messages -->
-            <div id="chat-messages" class="chat-container p-6 space-y-4 flex-1 overflow-y-auto bg-gray-50"></div>
+            <!-- Admin View -->
+            <div id="adminView" class="hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800">Admin Dashboard</h2>
+                    <button onclick="logoutAdmin()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">Logout</button>
+                </div>
 
-            <!-- Message Input -->
-            <div class="bg-white border-t p-4">
-                <div class="flex space-x-2">
-                    <input type="text" id="message-input" placeholder="Type your message..." class="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                    <button id="send-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-md font-medium">Send</button>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold mb-4">Tambah Produk Baru</h3>
+                        <form id="addProductForm" class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Nama Produk</label>
+                                <input type="text" id="productName" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Deskripsi</label>
+                                <textarea id="productDescription" rows="3"
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Harga (Rp)</label>
+                                <input type="number" id="productPrice" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Gambar (URL)</label>
+                                <input type="text" id="productImage" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                       placeholder="https://placehold.co/600x400" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Stok</label>
+                                <input type="number" id="productStock" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Tambah Produk</button>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-2">
+                        <h3 class="text-xl font-semibold mb-4">Daftar Produk</h3>
+                        <div id="adminProductsContainer" class="bg-white p-6 rounded-lg shadow overflow-x-auto">
+                            <!-- Admin products table will be loaded here -->
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <!-- Login Form -->
+            <div id="loginView" class="hidden max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold text-center mb-6">Login Admin</h2>
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Username</label>
+                        <input type="text" id="username" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Password</label>
+                        <input type="password" id="password" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Login</button>
+                </form>
+            </div>
+
+            <!-- Shopping Cart Sidebar -->
+            <div id="cartSidebar" class="hidden fixed inset-y-0 right-0 w-full md:w-96 bg-white shadow-xl p-6 overflow-y-auto z-50">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Keranjang Belanja</h2>
+                    <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d4ce0f01-4dc4-4870-85b0-fb44655f5f85.png" alt="Ikon tombol tutup sederhana" class="w-6 h-6" />
+                    </button>
+                </div>
+                
+                <div id="cartItemsContainer" class="space-y-4 mb-6">
+                    <!-- Cart items will be loaded here -->
+                </div>
+                
+                <div class="border-t pt-4">
+                    <div class="flex justify-between font-semibold text-lg mb-4">
+                        <span>Total:</span>
+                        <span id="cartTotal">Rp 0</span>
+                    </div>
+                    <button onclick="checkout()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Checkout</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-8">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between">
+                    <div class="mb-6 md:mb-0">
+                        <h3 class="text-xl font-bold mb-4">ryyn shop</h3>
+                        <p class="text-gray-400">Menjual produk berkualitas dengan harga terjangkau.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Kontak</h3>
+                        <p class="text-gray-400">Telepon: 6283119396819</p>
+                    </div>
+                </div>
+                <div class="pt-6 mt-6 border-t border-gray-700 text-center text-gray-400">
+                    <p>© 2023 TokoOnline. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script>
-        // Simple in-memory message store
-        const messageStore = {};
-        
-        // DOM Elements
-        const loginScreen = document.getElementById('login-screen');
-        const chatScreen = document.getElementById('chat-screen');
-        const loginBtn = document.getElementById('login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const usernameInput = document.getElementById('username');
-        const currentUserIdSpan = document.getElementById('current-user-id');
-        const targetUserIdInput = document.getElementById('target-user-id');
-        const connectBtn = document.getElementById('connect-btn');
-        const messageInput = document.getElementById('message-input');
-        const sendBtn = document.getElementById('send-btn');
-        const chatMessages = document.getElementById('chat-messages');
-        
-        // Current user and target
-        let currentUser = null;
-        let targetUser = null;
-        
-        // Initialize
-        function init() {
-            // Event Listeners
-            loginBtn.addEventListener('click', handleLogin);
-            logoutBtn.addEventListener('click', handleLogout);
-            connectBtn.addEventListener('click', handleConnect);
-            sendBtn.addEventListener('click', handleSendMessage);
-            messageInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    handleSendMessage();
-                }
+        // Initial data if localStorage is empty
+        const initialProducts = [
+            {
+                id: 1,
+                name: "Smartphone X",
+                description: "Smartphone canggih dengan kamera 48MP dan baterai tahan lama.",
+                price: 4999000,
+                image: "https://placehold.co/600x400",
+                stock: 50
+            },
+            {
+                id: 2,
+                name: "Laptop Pro",
+                description: "Laptop performa tinggi dengan prosesor terbaru dan grafis diskrit.",
+                price: 12999000,
+                image: "https://placehold.co/600x400",
+                stock: 30
+            },
+            {
+                id: 3,
+                name: "Headphone Premium",
+                description: "Headphone dengan kualitas suara tinggi dan noise cancellation.",
+                price: 1899000,
+                image: "https://placehold.co/600x400",
+                stock: 75
+            },
+            {
+                id: 4,
+                name: "Smart Watch",
+                description: "Jam tangan pintar dengan fitur pemantauan kesehatan dan notifikasi.",
+                price: 2499000,
+                image: "https://placehold.co/600x400",
+                stock: 40
+            }
+        ];
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load products from localStorage or initialize with sample data
+            let products = JSON.parse(localStorage.getItem('products')) || initialProducts;
+            localStorage.setItem('products', JSON.stringify(products));
+            
+            // Load cart from localStorage or initialize empty
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount(cart.length);
+            
+            // Render customer view by default
+            showCustomerView();
+            
+            // Setup event listeners
+            document.getElementById('addProductForm').addEventListener('submit', addProduct);
+            document.getElementById('loginForm').addEventListener('submit', adminLogin);
+        });
+
+        // Product functions
+        function renderProducts(products) {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = '';
+            
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card bg-white rounded-lg shadow-md overflow-hidden fade-in transition duration-300 ease-in-out hover:shadow-lg';
+                card.innerHTML = `
+                    <div class="h-48 overflow-hidden">
+                        <img src="${product.image || 'https://placehold.co/600x400'}" 
+                             alt="${product.name}" 
+                             class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">${product.name}</h3>
+                        <p class="text-gray-600 mb-4">${product.description}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-blue-600">Rp ${product.price.toLocaleString('id-ID')}</span>
+                            <button onclick="addToCart(${product.id})" 
+                                    class="px...
+
+=== CONTINUED FROM ABOVE ===
+
+Continue where the content was cut off due to length limit...
+
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                Beli
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
             });
         }
-        
-        // Login handler
-        function handleLogin() {
-            const username = usernameInput.value.trim();
-            if (!username) {
-                alert('Please enter your ID');
-                return;
-            }
-            
-            currentUser = username;
-            currentUserIdSpan.textContent = username;
-            
-            // Initialize user's message store if not exists
-            if (!messageStore[username]) {
-                messageStore[username] = [];
-            }
-            
-            // Transition to chat screen
-            loginScreen.classList.add('opacity-0');
-            setTimeout(() => {
-                loginScreen.classList.add('hidden');
-                chatScreen.classList.remove('hidden');
-            }, 300);
+
+        function renderAdminProducts(products) {
+            const container = document.getElementById('adminProductsContainer');
+            container.innerHTML = `
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b bg-gray-50">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produk</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Harga</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stok</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        ${products.map(product => `
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">${product.id}</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <img src="${product.image || 'https://placehold.co/600x400'}" 
+                                                 alt="${product.name}" 
+                                                 class="h-10 w-10 rounded-full">
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">${product.name}</div>
+                                            <div class="text-sm text-gray-500">${product.description.substring(0, 50)}...</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp ${product.price.toLocaleString('id-ID')}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.stock}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button onclick="deleteProduct(${product.id})" class="text-red-600 hover:text-red-900 mr-3">Hapus</button>
+                                    <button onclick="editProduct(${product.id})" class="text-blue-600 hover:text-blue-900">Edit</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
         }
-        
-        // Logout handler
-        function handleLogout() {
-            currentUser = null;
-            targetUser = null;
-            usernameInput.value = '';
-            targetUserIdInput.value = '';
-            chatMessages.innerHTML = '';
-            
-            // Transition to login screen
-            chatScreen.classList.add('hidden');
-            loginScreen.classList.remove('hidden');
-            loginScreen.classList.remove('opacity-0');
+
+        function filterProducts(searchTerm) {
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            const filtered = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                product.description.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            renderProducts(filtered);
         }
-        
-        // Connect to target user handler
-        function handleConnect() {
-            const targetUserId = targetUserIdInput.value.trim();
-            if (!targetUserId) {
-                alert('Please enter recipient ID');
-                return;
-            }
+
+        function addProduct(e) {
+            e.preventDefault();
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
             
-            targetUser = targetUserId;
-            
-            // Load messages (in a real app, this would be from a server)
-            loadMessages();
-        }
-        
-        // Send message handler
-        function handleSendMessage() {
-            const message = messageInput.value.trim();
-            if (!message || !currentUser || !targetUser) {
-                alert('Please connect to a user and enter a message');
-                return;
-            }
-            
-            // Create message object
-            const messageObj = {
-                sender: currentUser,
-                receiver: targetUser,
-                content: message,
-                timestamp: new Date().toISOString()
+            const newProduct = {
+                id: newId,
+                name: document.getElementById('productName').value,
+                description: document.getElementById('productDescription').value,
+                price: parseInt(document.getElementById('productPrice').value),
+                image: document.getElementById('productImage').value || 'https://placehold.co/600x400',
+                stock: parseInt(document.getElementById('productStock').value)
             };
             
-            // Store message (both sender and receiver)
-            if (!messageStore[currentUser]) messageStore[currentUser] = [];
-            if (!messageStore[targetUser]) messageStore[targetUser] = [];
+            products.push(newProduct);
+            localStorage.setItem('products', JSON.stringify(products));
             
-            messageStore[currentUser].push(messageObj);
-            messageStore[targetUser].push(messageObj);
+            // Render updated products
+            renderProducts(products);
+            renderAdminProducts(products);
             
-            // Display message
-            displayMessage(messageObj);
-            
-            // Clear input
-            messageInput.value = '';
+            // Reset form
+            document.getElementById('addProductForm').reset();
         }
-        
-        // Load messages
-        function loadMessages() {
-            chatMessages.innerHTML = '';
-            
-            if (!currentUser || !targetUser) return;
-            
-            const messages = messageStore[currentUser] || [];
-            const relevantMessages = messages.filter(msg => 
-                (msg.sender === currentUser && msg.receiver === targetUser) ||
-                (msg.sender === targetUser && msg.receiver === currentUser)
-            );
-            
-            relevantMessages.forEach(msg => {
-                displayMessage(msg);
-            });
-            
-            // Scroll to bottom
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        function deleteProduct(id) {
+            if (confirm('Anda yakin ingin menghapus produk ini?')) {
+                let products = JSON.parse(localStorage.getItem('products')) || [];
+                products = products.filter(product => product.id !== id);
+                localStorage.setItem('products', JSON.stringify(products));
+                
+                // Render updated products
+                renderProducts(products);
+                renderAdminProducts(products);
+            }
         }
-        
-        // Display message
-        function displayMessage(message) {
-            if (!message) return;
+
+        function editProduct(id) {
+            // Implementation for edit product
+            alert('Fitur edit akan diimplementasikan pada versi selanjutnya');
+        }
+
+        // Cart functions
+        function renderCartItems() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const container = document.getElementById('cartItemsContainer');
+            container.innerHTML = '';
             
-            const isCurrentUser = message.sender === currentUser;
-            const alignClass = isCurrentUser ? 'ml-auto' : 'mr-auto';
-            const bgColorClass = isCurrentUser ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 border';
-            
-            const messageElement = document.createElement('div');
-            messageElement.className = `message-box ${alignClass} ${bgColorClass} rounded-lg px-4 py-2 shadow-sm`;
-            
-            if (!isCurrentUser) {
-                messageElement.innerHTML = `
-                    <div class="text-xs font-semibold text-blue-600 mb-1">${message.sender}</div>
-                    <div>${message.content}</div>
-                    <div class="text-xs text-gray-500 mt-1 text-right">${new Date(message.timestamp).toLocaleTimeString()}</div>
-                `;
-            } else {
-                messageElement.innerHTML = `
-                    <div>${message.content}</div>
-                    <div class="text-xs text-blue-100 mt-1 text-right">${new Date(message.timestamp).toLocaleTimeString()}</div>
-                `;
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">Keranjang belanja kosong</p>';
+                document.getElementById('cartTotal').textContent = 'Rp 0';
+                return;
             }
             
-            chatMessages.appendChild(messageElement);
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            let total = 0;
             
-            // Scroll to bottom
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
-</body>
-</html>
-
-```
-
+            cart.forEach(item => {
+                const product = products.find(p => p.id === item.productId);
+                if (product) {
+                    total += product.price * item.quantity;
                     
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'flex items-center bor
