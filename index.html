@@ -3,408 +3,418 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Chat App</title>
+    <title>WhatsApp Clone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .chat-container {
-            height: calc(100vh - 160px);
-            overflow-y: auto;
-        }
-        .message-container {
+        .chat-bubble {
             max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            margin-bottom: 8px;
         }
-        .typing-indicator::after {
-            content: '...';
-            animation: typing 1.5s infinite;
-            display: inline-block;
-            width: 0;
+        .chat-bubble.sent {
+            background-color: #DCF8C6;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
         }
-        @keyframes typing {
-            0% { opacity: 0; }
-            50% { opacity: 1; }
-            100% { opacity: 0; }
+        .chat-bubble.received {
+            background-color: #ECECEC;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
         }
-        .slide-in {
-            animation: slideIn 0.3s ease-out;
-        }
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .chat-container {
+            min-height: calc(100vh - 140px);
         }
     </style>
 </head>
 <body class="bg-gray-100">
-    <!-- Login Screen -->
-    <div id="login-screen" class="fixed inset-0 flex items-center justify-center bg-white z-50">
-        <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-            <div class="text-center mb-8">
-                <img src="https://placehold.co/100x100" alt="Chat App Logo - Modern communication icon with blue bubbles" class="mx-auto mb-4 rounded-full">
-                <h1 class="text-3xl font-bold text-gray-800">Welcome to Simple Chat</h1>
-                <p class="text-gray-600 mt-2">Connect with anyone using their ID</p>
-            </div>
-            
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <input type="text" id="username" placeholder="Enter your name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <div id="app" class="max-w-md mx-auto bg-white min-h-screen flex flex-col">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="flex flex-col items-center justify-center h-screen p-6">
+            <div class="w-full max-w-xs">
+                <div class="text-center mb-8">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5bc6c84e-6e6f-478d-8b11-cce1172b83cf.png" alt="WhatsApp logo with green background and white phone icon" class="mx-auto mb-4 rounded-full">
+                    <h1 class="text-2xl font-bold text-gray-800">WhatsApp Clone</h1>
+                    <p class="text-gray-600 mt-2">Silakan masuk dengan nomor Anda</p>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-200">Start Chatting</button>
-            </form>
-            
-            <div class="mt-6 text-center text-sm text-gray-500">
-                No account needed - just enter a name to start
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <form id="loginForm" class="space-y-4">
+                        <div>
+                            <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Nomor Telepon</label>
+                            <input type="text" id="phoneNumber" placeholder="Contoh: 628123456789" 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label for="displayName" class="block text-sm font-medium text-gray-700">Nama</label>
+                            <input type="text" id="displayName" placeholder="Nama Anda" 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            Masuk
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Chat Screen -->
-    <div id="chat-screen" class="hidden h-screen flex flex-col">
-        <!-- Header -->
-        <header class="bg-white shadow-sm py-4 px-6 flex items-center justify-between border-b border-gray-200">
-            <div class="flex items-center">
-                <button id="back-button" class="mr-4 text-blue-600 hover:text-blue-800 hidden">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-                <div id="current-chat" class="flex items-center">
-                    <img id="chat-avatar" src="https://placehold.co/40x40" alt="Profile picture of person you're chatting with" class="w-10 h-10 rounded-full mr-3">
-                    <div>
-                        <h2 id="chat-name" class="font-semibold text-gray-800">Select a chat</h2>
-                        <p id="chat-status" class="text-xs text-gray-500">Online</p>
-                    </div>
-                </div>
-            </div>
-            <button id="profile-button" class="text-blue-600 hover:text-blue-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            </button>
-        </header>
-
-        <!-- Main Chat Area -->
-        <div class="flex-1 overflow-hidden flex">
-            <!-- Chat List -->
-            <div id="chat-list" class="w-full md:w-80 bg-white border-r border-gray-200 overflow-y-auto">
-                <div class="p-4 border-b border-gray-200">
-                    <div class="relative">
-                        <input type="text" id="search-contact" placeholder="Search by ID or name" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        <!-- Chat Screen -->
+        <div id="chatScreen" class="hidden flex-col h-screen">
+            <!-- Header -->
+            <div class="bg-green-600 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center">
+                    <button id="backButton" class="mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                         </svg>
+                    </button>
+                    <div>
+                        <h2 class="font-semibold" id="currentChatName"></h2>
+                        <p class="text-xs opacity-75">Online</p>
                     </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v8a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contact List -->
+            <div id="contactList" class="flex-1 overflow-y-auto bg-gray-100">
+                <h3 class="p-4 font-medium text-gray-500 bg-white">Kontak</h3>
+                <div id="contactsContainer" class="bg-white divide-y divide-gray-100">
+                </div>
+            </div>
+
+            <!-- Chat Room (initially hidden) -->
+            <div id="chatRoom" class="hidden flex-1 flex-col bg-gray-100">
+                <div id="chatContainer" class="chat-container flex flex-col p-4 overflow-y-auto">
                 </div>
                 
-                <div id="contacts-list" class="space-y-1 p-2">
-                    <div class="text-center py-10 text-gray-500">
-                        No contacts found. Search for someone by their ID.
-                    </div>
+                <div class="bg-gray-100 p-4 border-t border-gray-200">
+                    <form id="messageForm" class="flex space-x-2">
+                        <input type="text" id="messageInput" placeholder="Ketik pesan..." 
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-green-500">
+                        <button type="submit" class="p-2 rounded-full bg-green-600 text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                            </svg>
+                        </button>
+                    </form>
                 </div>
             </div>
 
-            <!-- Chat Messages -->
-            <div id="messages-panel" class="hidden md:flex flex-col flex-1 bg-gray-50">
-                <div id="no-chat-selected" class="flex flex-col items-center justify-center h-full text-center p-8">
-                    <img src="https://placehold.co/200x200" alt="Select a chat to start messaging - illustration of messaging bubbles" class="w-40 h-40 mb-4">
-                    <h3 class="text-xl font-semibold text-gray-700 mb-2">Select a chat to start messaging</h3>
-                    <p class="text-gray-500">Find users by their ID or start a new conversation.</p>
-                </div>
-
-                <div id="chat-area" class="hidden flex-col h-full">
-                    <!-- Messages will appear here -->
-                    <div id="messages-container" class="chat-container p-4 space-y-2">
-                        
+            <!-- New Chat Modal -->
+            <div id="newChatModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-10 hidden">
+                <div class="bg-white rounded-lg w-full max-w-md">
+                    <div class="p-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Chat Baru</h3>
                     </div>
-                    
-                    <!-- Message Input -->
-                    <div class="bg-white p-4 border-t border-gray-200">
-                        <form id="message-form" class="flex space-x-2">
-                            <input type="text" id="message-input" placeholder="Type a message..." class="flex-1 border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 w-10 h-10 flex items-center justify-center transition duration-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </form>
+                    <div class="p-4">
+                        <div class="mb-4">
+                            <label for="recipientId" class="block text-sm font-medium text-gray-700">ID Penerima</label>
+                            <input type="text" id="recipientId" placeholder="Masukkan ID kontak" 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 flex justify-end border-t border-gray-200">
+                        <button type="button" id="cancelNewChat" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            Batal
+                        </button>
+                        <button type="button" id="startNewChat" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            Mulai Chat
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Profile Modal -->
-    <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-800">Your Profile</h3>
-                <button id="close-profile" class="text-gray-500 hover:text-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="flex flex-col items-center mb-6">
-                <img src="https://placehold.co/100x100" alt="Your profile picture" id="user-avatar" class="w-20 h-20 rounded-full mb-3">
-                <h2 id="profile-name" class="font-semibold text-lg"></h2>
-                <p class="text-gray-500 text-sm">Your ID: <span id="user-id" class="font-mono"></span></p>
-            </div>
-            
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Share your ID</label>
-                    <div class="flex">
-                        <input type="text" id="share-id-input" readonly class="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:outline-none">
-                        <button id="copy-id" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-lg transition duration-200">Copy</button>
-                    </div>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Link your profile</label>
-                    <div class="flex">
-                        <input type="text" id="profile-link-input" readonly class="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:outline-none">
-                        <button id="copy-link" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-lg transition duration-200">Copy</button>
-                    </div>
-                </div>
-            </div>
-            
-            <button id="logout-button" class="mt-6 w-full bg-red-100 hover:bg-red-200 text-red-700 py-2 px-4 rounded-lg transition duration-200">
-                Logout
-            </button>
         </div>
     </div>
 
     <script>
-        // Simulated database
-        const db = {
-            users: {},
-            messages: {},
-            currentUser: null
+        // Data storage
+        const users = {
+            '628123456789': { name: 'John Doe', avatar: 'https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/3b0ff398-c568-466c-8610-b1a3bb95ad1e.png' },
+            '628987654321': { name: 'Jane Smith', avatar: 'https://placehold.co/96' }
         };
 
-        // DOM elements
-        const loginScreen = document.getElementById('login-screen');
-        const loginForm = document.getElementById('login-form');
-        const chatScreen = document.getElementById('chat-screen');
-        const chatList = document.getElementById('chat-list');
-        const messagesPanel = document.getElementById('messages-panel');
-        const noChatSelected = document.getElementById('no-chat-selected');
-        const chatArea = document.getElementById('chat-area');
-        const messagesContainer = document.getElementById('messages-container');
-        const messageForm = document.getElementById('message-form');
-        const messageInput = document.getElementById('message-input');
-        const searchContact = document.getElementById('search-contact');
-        const contactsList = document.getElementById('contacts-list');
-        const backButton = document.getElementById('back-button');
-        const currentChat = document.getElementById('current-chat');
-        const profileButton = document.getElementById('profile-button');
-        const profileModal = document.getElementById('profile-modal');
-        const closeProfile = document.getElementById('close-profile');
-        const profileName = document.getElementById('profile-name');
-        const userId = document.getElementById('user-id');
-        const shareIdInput = document.getElementById('share-id-input');
-        const profileLinkInput = document.getElementById('profile-link-input');
-        const copyId = document.getElementById('copy-id');
-        const copyLink = document.getElementById('copy-link');
-        const logoutButton = document.getElementById('logout-button');
-        const userAvatar = document.getElementById('user-avatar');
+        const contacts = [
+            { id: '628123456789', name: 'John Doe', lastMessage: 'Hai, apa kabar?', time: '10:30 AM' },
+            { id: '628987654321', name: 'Jane Smith', lastMessage: 'Meeting jam 2', time: '09:15 AM' }
+        ];
 
-        // Random ID generator
-        function generateId() {
-            return 'id-' + Math.random().toString(36).substr(2, 9);
-        }
+        let currentUser = null;
+        let currentChatWith = null;
+        let chats = JSON.parse(localStorage.getItem('chats')) || {};
 
-        // Random color generator for avatars
-        function getRandomColor() {
-            const colors = ['blue', 'green', 'purple', 'pink', 'orange', 'red'];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
+        // DOM Elements
+        const loginScreen = document.getElementById('loginScreen');
+        const chatScreen = document.getElementById('chatScreen');
+        const contactList = document.getElementById('contactList');
+        const chatRoom = document.getElementById('chatRoom');
+        const chatContainer = document.getElementById('chatContainer');
+        const contactsContainer = document.getElementById('contactsContainer');
+        const currentChatName = document.getElementById('currentChatName');
+        const loginForm = document.getElementById('loginForm');
+        const phoneNumberInput = document.getElementById('phoneNumber');
+        const displayNameInput = document.getElementById('displayName');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+        const backButton = document.getElementById('backButton');
+        const newChatModal = document.getElementById('newChatModal');
+        const recipientIdInput = document.getElementById('recipientId');
+        const startNewChatBtn = document.getElementById('startNewChat');
+        const cancelNewChatBtn = document.getElementById('cancelNewChat');
 
-        // Generate avatar URL based on name
-        function generateAvatarUrl(name) {
-            const color = getRandomColor();
-            return `https://placehold.co/100x100/${color}/white?text=${name.charAt(0).toUpperCase()}`;
-        }
-
-        // Login handler
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            
-            if (username) {
-                // Create user if not exists
-                const userId = generateId();
-                const user = {
-                    id: userId,
-                    name: username,
-                    avatar: generateAvatarUrl(username),
-                    lastSeen: 'Online',
-                    contacts: []
-                };
-                
-                db.users[userId] = user;
-                db.currentUser = userId;
-                
-                // Update profile
-                profileName.textContent = username;
-                userId.textContent = userId;
-                shareIdInput.value = userId;
-                profileLinkInput.value = `${window.location.href.split('?')[0]}?user=${userId}`;
-                userAvatar.src = user.avatar;
-                
-                // Show chat screen
-                loginScreen.classList.add('hidden');
-                chatScreen.classList.remove('hidden');
-                
-                // Check URL for user parameter to auto-start chat
-                checkUrlForChat();
-            }
-        });
-
-        // Check URL for user parameter
-        function checkUrlForChat() {
-            const params = new URLSearchParams(window.location.search);
-            const userIdParam = params.get('user');
-            
-            if (userIdParam && userIdParam !== db.currentUser) {
-                startChatWithUser(userIdParam);
-                
-                // Update URL without refresh
-                const newUrl = window.location.pathname;
-                window.history.pushState({}, '', newUrl);
-            }
-        }
-
-        // Search contacts handler
-        searchContact.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            
-            if (!searchTerm) {
-                contactsList.innerHTML = '<div class="text-center py-10 text-gray-500">No contacts found. Search for someone by their ID.</div>';
-                return;
-            }
-            
-            const results = Object.values(db.users).filter(user => {
-                return user.id !== db.currentUser && 
-                      (user.id.toLowerCase().includes(searchTerm) || 
-                       user.name.toLowerCase().includes(searchTerm));
-            });
-            
-            if (results.length === 0) {
-                contactsList.innerHTML = '<div class="text-center py-10 text-gray-500">No contacts found. Try a different search.</div>';
+        // Initialize app
+        function initApp() {
+            // Check if user is already logged in
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showChatScreen();
+                renderContacts();
             } else {
-                contactsList.innerHTML = '';
-                results.forEach(user => {
-                    const contactElement = document.createElement('div');
-                    contactElement.className = 'flex items-center p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition duration-200';
-                    contactElement.onclick = () => startChatWithUser(user.id);
-                    
-                    contactElement.innerHTML = `
-                        <img src="${user.avatar}" alt="Profile picture of ${user.name}" class="w-10 h-10 rounded-full mr-3">
-                        <div class="flex-1">
-                            <h3 class="font-medium text-gray-800">${user.name}</h3>
-                            <p class="text-sm text-gray-500">${user.id}</p>
-                        </div>
-                    `;
-                    
-                    contactsList.appendChild(contactElement);
-                });
-            }
-        });
-
-        // Start chat with user
-        function startChatWithUser(userId) {
-            const user = db.users[userId];
-            if (!user) {
-                alert('User not found. That ID might not exist yet.');
-                return;
-            }
-            
-            // Update UI
-            document.getElementById('chat-name').textContent = user.name;
-            document.getElementById('chat-avatar').src = user.avatar;
-            document.getElementById('chat-status').textContent = user.lastSeen;
-            
-            // Hide chat list on mobile
-            if (window.innerWidth < 768) {
-                chatList.classList.add('hidden');
-                backButton.classList.remove('hidden');
-            }
-            
-            // Show chat area
-            noChatSelected.classList.add('hidden');
-            chatArea.classList.remove('hidden');
-            
-            // Load or create conversation
-            const conversationId = [db.currentUser, userId].sort().join('-');
-            if (!db.messages[conversationId]) {
-                db.messages[conversationId] = [];
-            }
-            
-            // Display messages
-            renderMessages(conversationId);
-            
-            // Auto-scroll to bottom
-            setTimeout(() => {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }, 100);
-            
-            // Add to contacts if not already
-            if (!db.users[db.currentUser].contacts.includes(userId)) {
-                db.users[db.currentUser].contacts.push(userId);
+                showLoginScreen();
             }
         }
 
-        // Render messages
-        function renderMessages(conversationId) {
-            messagesContainer.innerHTML = '';
+        // Show login screen
+        function showLoginScreen() {
+            loginScreen.classList.remove('hidden');
+            chatScreen.classList.add('hidden');
+        }
+
+        // Show chat screen
+        function showChatScreen() {
+            loginScreen.classList.add('hidden');
+            chatScreen.classList.remove('hidden');
+        }
+
+        // Show chat room
+        function showChatRoom(contactId) {
+            contactList.classList.add('hidden');
+            chatRoom.classList.remove('hidden');
+            currentChatWith = contactId;
+
+            const contact = contacts.find(c => c.id === contactId) || 
+                           { id: contactId, name: contactId, lastMessage: 'Belum ada pesan' };
             
-            const messages = db.messages[conversationId] || [];
+            currentChatName.textContent = contact.name;
+            renderChatMessages(contactId);
+        }
+
+        // Show contact list
+        function showContactList() {
+            contactList.classList.remove('hidden');
+            chatRoom.classList.add('hidden');
+            currentChatWith = null;
+        }
+
+        // Render contacts list
+        function renderContacts() {
+            contactsContainer.innerHTML = '';
             
-            messages.forEach(msg => {
-                const isMe = msg.sender === db.currentUser;
+            // Add new chat button
+            const newChatItem = document.createElement('div');
+            newChatItem.className = 'p-4 flex items-center bg-green-50 cursor-pointer';
+            newChatItem.innerHTML = `
+                <div class="bg-green-100 p-2 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-medium">Chat Baru</h4>
+                </div>
+            `;
+            newChatItem.addEventListener('click', () => {
+                newChatModal.classList.remove('hidden');
+            });
+            contactsContainer.appendChild(newChatItem);
+            
+            // Add contacts
+            contacts.forEach(contact => {
+                const contactItem = document.createElement('div');
+                contactItem.className = 'p-4 flex items-center cursor-pointer hover:bg-gray-50';
+                contactItem.addEventListener('click', () => showChatRoom(contact.id));
                 
-                const messageElement = document.createElement('div');
-                messageElement.className = `message-container ${isMe ? 'ml-auto' : 'mr-auto'}`;
-                
-                messageElement.innerHTML = `
-                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'} mb-1 slide-in">
-                        <div class="${isMe ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} px-4 py-2 rounded-xl shadow-sm max-w-full">
-                            ${msg.text}
+                contactItem.innerHTML = `
+                    <img src="${users[contact.id]?.avatar || 'https://placehold.co/96'}" alt="Profile picture of ${contact.name}" class="h-12 w-12 rounded-full mr-3">
+                    <div class="flex-1">
+                        <div class="flex justify-between">
+                            <h4 class="font-medium">${contact.name}</h4>
+                            <span class="text-xs text-gray-500">${contact.time}</span>
                         </div>
-                    </div>
-                    <div class="text-xs text-gray-500 ${isMe ? 'text-right mr-2' : 'text-left ml-2'} mb-3">
-                        ${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        <p class="text-sm text-gray-500 truncate">${contact.lastMessage}</p>
                     </div>
                 `;
                 
-                messagesContainer.appendChild(messageElement);
+                contactsContainer.appendChild(contactItem);
             });
         }
 
-        // Send message handler
-        messageForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const text = messageInput.value.trim();
+        // Render chat messages
+        function renderChatMessages(recipientId) {
+            chatContainer.innerHTML = '';
             
-            if (text && document.getElementById('chat-name').textContent !== 'Select a chat') {
-                const receiver = Object.values(db.users).find(user => 
-                    user.name === document.getElementById('chat-name').textContent).id;
+            // Create a unique chat ID combining both user IDs
+            const chatId = [currentUser.id, recipientId].sort().join('_');
+            const chatMessages = chats[chatId] || [];
+            
+            if (chatMessages.length === 0) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'flex items-center justify-center h-full text-gray-500';
+                emptyState.textContent = 'Belum ada pesan. Mulai percakapan sekarang!';
+                chatContainer.appendChild(emptyState);
+                return;
+            }
+            
+            chatMessages.forEach(msg => {
+                const isSent = msg.sender === currentUser.id;
+                const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 
-                const conversationId = [db.currentUser, receiver].sort().join('-');
-                const message = {
-                    sender: db.currentUser,
-                    receiver: receiver,
-                    text: text,
-                    timestamp: Date.now(),
-                    read: false
+                const messageElement = document.createElement('div');
+                messageElement.className = `flex flex-col ${isSent ? 'items-end' : 'items-start'}`;
+                
+                messageElement.innerHTML = `
+                    <div class="chat-bubble ${isSent ? 'sent' : 'received'}">
+                        <p>${msg.text}</p>
+                        <span class="text-xs text-gray-500 float-right mt-1">${time}</span>
+                    </div>
+                `;
+                
+                chatContainer.appendChild(messageElement);
+            });
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Save message to storage
+        function saveMessage(sender, recipient, text) {
+            const chatId = [sender, recipient].sort().join('_');
+            
+            if (!chats[chatId]) {
+                chats[chatId] = [];
+            }
+            
+            const newMessage = {
+                sender,
+                recipient,
+                text,
+                timestamp: new Date().toISOString()
+            };
+            
+            chats[chatId].push(newMessage);
+            localStorage.setItem('chats', JSON.stringify(chats));
+            
+            // Update last message in contacts
+            const otherUserId = sender === currentUser.id ? recipient : sender;
+            const contact = contacts.find(c => c.id === otherUserId);
+            if (contact) {
+                contact.lastMessage = text;
+                contact.time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+        }
+
+        // Event Listeners
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const phoneNumber = phoneNumberInput.value.trim();
+            const displayName = displayNameInput.value.trim();
+            
+            if (!phoneNumber || !displayName) {
+                alert('Silakan isi nomor telepon dan nama Anda');
+                return;
+            }
+            
+            // Save user data
+            currentUser = {
+                id: phoneNumber,
+                name: displayName
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Add to users if not exists
+            if (!users[phoneNumber]) {
+                users[phoneNumber] = { 
+                    name: displayName, 
+                    avatar: 'https://placehold.co/96' 
                 };
                 
-                db.messages[conversationId].push(message);
-                messageInput.value = '';
-                
-                // Add to contacts if not already
-                if (!db.users[db.currentUser].contacts.includes(receiver)) {
-                    db.users[db.currentUser].contacts.push(receiver);
+                // Add to contacts if not exists
+                const exists = contacts.some(c => c.id === phoneNumber);
+                if (!exists) {
+                    contacts.push({ 
+                        id: phoneNumber, 
+                        name: displayName, 
+                        lastMessage: 'Belum ada pesan', 
+                        time: '' 
+                    });
                 }
-                
-           
+            }
+            
+            showChatScreen();
+            renderContacts();
+        });
+
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const message = messageInput.value.trim();
+            if (!message || !currentChatWith) return;
+            
+            // Save message
+            saveMessage(currentUser.id, currentChatWith, message);
+            
+            // Render message
+            renderChatMessages(currentChatWith);
+            
+            // Clear input
+            messageInput.value = '';
+        });
+
+        backButton.addEventListener('click', function() {
+            showContactList();
+        });
+
+        startNewChatBtn.addEventListener('click', function() {
+            const recipientId = recipientIdInput.value.trim();
+            if (!recipientId) return;
+            
+            // Check if recipient exists in users
+            const recipientName = users[recipientId]?.name || recipientId;
+            
+            // Add to contacts if not exists
+            const exists = contacts.some(c => c.id === recipientId);
+            if (!exists) {
+                contacts.push({ 
+                    id: recipientId, 
+                    name: recipientName, 
+                    lastMessage: 'Belum ada pesan', 
+                    time: '' 
+                });
+            }
+            
+            // Close modal and open chat
+            newChatModal.classList.add('hidden');
+            recipientIdInput.value = '';
+            renderContacts();
+            showChatRoom(recipientId);
+        });
+
+        cancelNewChatBtn.addEventListener('click', function() {
+            newChatModal.classList.add('hidden');
+            recipientIdInput.value = '';
+        });
+
+        // Initialize the app
+        initApp();
+    </script>
+</body>
+    </html>
+    
